@@ -2,6 +2,7 @@ package main
 
 import (
 	"bee-library/db"
+	"bee-library/features/books"
 	bookRepo "bee-library/features/books/repository"
 	"bee-library/features/members"
 	memberRepo "bee-library/features/members/repository"
@@ -25,6 +26,7 @@ func main() {
 
 	r := gin.Default()
 	members.RegisterMemberRoutes(r)
+	books.RegisterBookRoutes(r)
 
 	r.Run(":8000")
 }

@@ -6,6 +6,7 @@ var (
 	ErrNotFound       = errors.New("data not found")
 	ErrBadRequest     = errors.New("invalid request")
 	ErrEmailExists    = errors.New("email already exists")
+	ErrIsbnExists     = errors.New("isbn already exists")
 	ErrUnauthorized   = errors.New("unauthorized")
 	ErrInternalServer = errors.New("internal server error")
 )

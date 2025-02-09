@@ -12,7 +12,7 @@ type MemberRepository interface {
 	GetByID(id uint) (*entity.Member, error)
 	Create(member *entity.Member) error
 	// login
-	Update(id uint, updatedMember *entity.Member) error
+	Update(id uint, updatedFields map[string]interface{}) error
 	// update password
 	Delete(id uint) error
 	IsEmailExist(email string) (bool, error)
@@ -42,9 +42,10 @@ func (r *memberRepository) Create(member *entity.Member) error {
 	return r.db.Create(member).Error
 }
 
-func (r *memberRepository) Update(id uint, updatedMember *entity.Member) error {
-	return r.db.Model(&entity.Member{}).Where("id = ?", id).Updates(updatedMember).Error
+func (r *memberRepository) Update(id uint, updatedFields map[string]interface{}) error {
+	return r.db.Model(&entity.Member{}).Where("id = ?", id).Updates(updatedFields).Error
 }
+
 
 func (r *memberRepository) Delete(id uint) error {
 	return r.db.Delete(&entity.Member{}, id).Error

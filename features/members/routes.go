@@ -14,9 +14,12 @@ func RegisterMemberRoutes(r *gin.Engine) {
 	memberService := service.NewMemberService(memberRepo)
 	memberHandler := handler.NewMemberHandler(memberService)
 
-	r.GET("/members", memberHandler.GetAllMembers)
-	r.GET("/members/:id", memberHandler.GetMemberByID)
-	r.POST("/members", memberHandler.CreateMember)
-	r.PUT("/members/:id", memberHandler.UpdateMember)
-	r.DELETE("/members/:id", memberHandler.DeleteMember)
+	memberRoutes := r.Group("/members")
+	{
+		memberRoutes.GET("/", memberHandler.GetAllMembers)
+		memberRoutes.GET("/:id", memberHandler.GetMemberByID)
+		memberRoutes.POST("/", memberHandler.CreateMember)
+		memberRoutes.PUT("/:id", memberHandler.UpdateMember)
+		memberRoutes.DELETE("/:id", memberHandler.DeleteMember)
+	}
 }

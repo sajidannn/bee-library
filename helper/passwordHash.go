@@ -8,8 +8,8 @@ import (
 
 const (
 	MinCost     int = 4
-	MaxCost     int = 31
-	DefaultCost int = 14
+	MaxCost     int = 10
+	DefaultCost int = 10
 )
 
 func HashPassword(password string) (string, error) {

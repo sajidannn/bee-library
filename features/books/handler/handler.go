@@ -1,0 +1,152 @@
+package handler
+
+import (
+	"bee-library/features/books/entity"
+	"bee-library/features/books/service"
+	"bee-library/helper"
+	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
+)
+
+type BookHandler struct {
+	service service.BookService
+}
+
+func NewBookHandler(service service.BookService) *BookHandler {
+	return &BookHandler{service: service}
+}
+
+func (h *BookHandler) GetAllBooks(c *gin.Context) {
+	books, err := h.service.GetAllBooks()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, helper.ResponseError{
+			Status:  "error",
+			Message: "Failed to fetch books",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, helper.Response{
+		Status:  "success",
+		Message: "Books retrieved successfully",
+		Data:    ToBookResponseList(books),
+	})
+}
+
+func (h *BookHandler) GetBookByID(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	book, err := h.service.GetBookByID(uint(id))
+	if err != nil {
+		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
+			Status:  "error",
+			Message: err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, helper.Response{
+		Status:  "success",
+		Message: "Book retrieved successfully",
+		Data:    ToBookResponse(*book),
+	})
+}
+
+func (h *BookHandler) CreateBook(c *gin.Context) {
+	var req BookCreateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, helper.ResponseError{
+			Status:  "error",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	newBook := entity.Book{
+		Title:      req.Title,
+		Author: 	 	req.Author,
+		Publisher:  req.Publisher,
+		Category:   req.Category,
+		Isbn:       req.Isbn,
+		Year:       req.Year,
+		CoverImage: req.CoverImage,
+	}
+
+	err := h.service.CreateBook(&newBook)
+	if err != nil {
+		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
+			Status:  "error",
+			Message: err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusCreated, helper.Response{
+		Status:  "success",
+		Message: "Book created successfully",
+		Data:    ToBookResponse(newBook),
+	})
+}
+
+func (h *BookHandler) UpdateBook(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	var req BookUpdateRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, helper.ResponseError{
+			Status:  "error",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	updatedBook := entity.Book{}
+	if req.Title != nil {
+		updatedBook.Title = *req.Title
+	}
+	if req.Author != nil {
+		updatedBook.Author = *req.Author
+	}
+	if req.Publisher != nil {
+		updatedBook.Publisher = *req.Publisher
+	}
+	if req.Category != nil {
+		updatedBook.Category = *req.Category
+	}
+	if req.Isbn != nil {
+		updatedBook.Isbn = *req.Isbn
+	}
+	if req.Year != nil {
+		updatedBook.Year = *req.Year
+	}
+	if req.CoverImage != nil {
+		updatedBook.CoverImage = *req.CoverImage
+	}
+
+	err := h.service.UpdateBook(uint(id), &updatedBook)
+	if err != nil {
+		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
+			Status:  "error",
+			Message: err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, helper.Response{
+		Status:  "success",
+		Message: "Book updated successfully",
+		Data:    ToBookResponse(updatedBook),
+	})
+}
+
+func (h *BookHandler) DeleteBook(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	err := h.service.DeleteBook(uint(id))
+	if err != nil {
+		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
+			Status:  "error",
+			Message: err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, helper.Response{
+		Status:  "success",
+		Message: "Book deleted successfully",
+	})
+}

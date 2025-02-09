@@ -98,24 +98,31 @@ func (h *MemberHandler) UpdateMember(c *gin.Context) {
 		return
 	}
 
-	updatedMember := entity.Member{}
+	// Simpan hanya field yang dikirim dalam map[string]interface{}
+	updatedFields := make(map[string]interface{})
 	if req.Name != nil {
-		updatedMember.Name = *req.Name
-	}
-	if req.Email != nil {
-		updatedMember.Email = *req.Email
+		updatedFields["name"] = *req.Name
 	}
 	if req.Phone != nil {
-		updatedMember.Phone = *req.Phone
+		updatedFields["phone"] = *req.Phone
 	}
 	if req.Address != nil {
-		updatedMember.Address = *req.Address
+		updatedFields["address"] = *req.Address
 	}
 	if req.Photo != nil {
-		updatedMember.Photo = *req.Photo
+		updatedFields["photo"] = *req.Photo
 	}
 
-	err := h.service.UpdateMember(uint(id), &updatedMember)
+	// Jika tidak ada field yang diperbarui, return error
+	if len(updatedFields) == 0 {
+		c.JSON(http.StatusBadRequest, helper.ResponseError{
+			Status:  "error",
+			Message: "No fields to update",
+		})
+		return
+	}
+
+	err := h.service.UpdateMember(uint(id), updatedFields)
 	if err != nil {
 		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
 			Status:  "error",
@@ -126,9 +133,9 @@ func (h *MemberHandler) UpdateMember(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.Response{
 		Status:  "success",
 		Message: "Member updated successfully",
-		Data:    ToMemberResponse(updatedMember),
 	})
 }
+
 
 // update password
 
