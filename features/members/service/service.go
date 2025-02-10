@@ -11,7 +11,7 @@ type MemberService interface {
 	GetMemberByID(id uint) (*entity.Member, error)
 	CreateMember(member *entity.Member) error
 	// login
-	UpdateMember(id uint, updatedFields map[string]interface{}) error
+	UpdateMember(id uint, updatedMember *entity.Member) error
 	// update password
 	DeleteMember(id uint) error
 }
@@ -31,7 +31,7 @@ func (s *memberService) GetAllMembers() ([]entity.Member, error) {
 func (s *memberService) GetMemberByID(id uint) (*entity.Member, error) {
 	member, err := s.repo.GetByID(id)
 	if err != nil {
-		return nil, helper.ErrNotFound
+		return nil, err
 	}
 	return member, nil
 }
@@ -53,12 +53,12 @@ func (s *memberService) CreateMember(newMember *entity.Member) error {
 	return nil
 }
 
-func (s *memberService) UpdateMember(id uint, updatedFields map[string]interface{}) error {
+func (s *memberService) UpdateMember(id uint, updatedMember *entity.Member) error {
 	_, err := s.GetMemberByID(id)
 	if err != nil {
 		return err
 	}
-	if err := s.repo.Update(id, updatedFields); err != nil {
+	if err := s.repo.Update(id, updatedMember); err != nil {
 		return helper.ErrInternalServer
 	}
 	return nil

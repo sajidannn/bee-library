@@ -15,7 +15,6 @@ type BookUpdateRequest struct {
 	Author     *string `json:"author"`
 	Publisher  *string `json:"publisher"`
 	Category   *string `json:"category"`
-	Isbn       *string `json:"isbn"`
 	Year       *string `json:"year"`
 	CoverImage *string `json:"cover_image"`
 }

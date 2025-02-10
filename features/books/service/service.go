@@ -27,11 +27,7 @@ func (s *bookService) GetAllBooks() ([]entity.Book, error) {
 }
 
 func (s *bookService) GetBookByID(id uint) (*entity.Book, error) {
-	book, err := s.repo.GetByID(id)
-	if err != nil {
-		return nil, helper.ErrNotFound
-	}
-	return book, nil
+	return s.repo.GetByID(id)
 }
 
 func (s *bookService) CreateBook(newBook *entity.Book) error {

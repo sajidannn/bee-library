@@ -2,7 +2,9 @@ package repository
 
 import (
 	"bee-library/features/books/entity"
+	entityStock "bee-library/features/stocks/entity"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -26,18 +28,45 @@ func NewBookRepository(db *gorm.DB) BookRepository {
 
 func (r *bookRepository) GetAll() ([]entity.Book, error) {
 	var books []entity.Book
-	err := r.db.Find(&books).Error
+	err := r.db.Select("id, title, author, publisher, category").
+		Find(&books).Error
 	return books, err
 }
 
 func (r *bookRepository) GetByID(id uint) (*entity.Book, error) {
 	var book entity.Book
 	err := r.db.First(&book, id).Error
-	return &book, err
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("book not found")
+		}
+		return nil, err
+	}
+	return &book, nil
 }
 
 func (r *bookRepository) Create(book *entity.Book) error {
-	return r.db.Create(book).Error
+	tx := r.db.Begin()
+
+	if err := tx.Create(book).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	stock := entityStock.Stock{
+		BookID:         book.ID,
+		TotalStock:     1,
+		AvailableStock: 1,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
+	}
+
+	if err := tx.Create(&stock).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
 }
 
 func (r *bookRepository) Update(id uint, updatedBook *entity.Book) error {

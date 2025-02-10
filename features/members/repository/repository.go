@@ -2,6 +2,7 @@ package repository
 
 import (
 	"bee-library/features/members/entity"
+	"bee-library/helper"
 	"errors"
 
 	"gorm.io/gorm"
@@ -12,7 +13,7 @@ type MemberRepository interface {
 	GetByID(id uint) (*entity.Member, error)
 	Create(member *entity.Member) error
 	// login
-	Update(id uint, updatedFields map[string]interface{}) error
+	Update(id uint, updatedMember *entity.Member) error
 	// update password
 	Delete(id uint) error
 	IsEmailExist(email string) (bool, error)
@@ -35,6 +36,12 @@ func (r *memberRepository) GetAll() ([]entity.Member, error) {
 func (r *memberRepository) GetByID(id uint) (*entity.Member, error) {
 	var member entity.Member
 	err := r.db.First(&member, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, helper.ErrNotFound
+		}
+		return nil, err
+	}
 	return &member, err
 }
 
@@ -42,8 +49,8 @@ func (r *memberRepository) Create(member *entity.Member) error {
 	return r.db.Create(member).Error
 }
 
-func (r *memberRepository) Update(id uint, updatedFields map[string]interface{}) error {
-	return r.db.Model(&entity.Member{}).Where("id = ?", id).Updates(updatedFields).Error
+func (r *memberRepository) Update(id uint, updatedMember *entity.Member) error {
+	return r.db.Model(&entity.Member{}).Where("id = ?", id).Updates(updatedMember).Error
 }
 
 

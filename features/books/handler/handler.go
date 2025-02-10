@@ -6,6 +6,7 @@ import (
 	"bee-library/helper"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -69,6 +70,8 @@ func (h *BookHandler) CreateBook(c *gin.Context) {
 		Isbn:       req.Isbn,
 		Year:       req.Year,
 		CoverImage: req.CoverImage,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 	}
 
 	err := h.service.CreateBook(&newBook)
@@ -110,15 +113,13 @@ func (h *BookHandler) UpdateBook(c *gin.Context) {
 	if req.Category != nil {
 		updatedBook.Category = *req.Category
 	}
-	if req.Isbn != nil {
-		updatedBook.Isbn = *req.Isbn
-	}
 	if req.Year != nil {
 		updatedBook.Year = *req.Year
 	}
 	if req.CoverImage != nil {
 		updatedBook.CoverImage = *req.CoverImage
 	}
+	updatedBook.UpdatedAt = time.Now()
 
 	err := h.service.UpdateBook(uint(id), &updatedBook)
 	if err != nil {
@@ -131,7 +132,6 @@ func (h *BookHandler) UpdateBook(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.Response{
 		Status:  "success",
 		Message: "Book updated successfully",
-		Data:    ToBookResponse(updatedBook),
 	})
 }
 

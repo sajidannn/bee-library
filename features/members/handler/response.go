@@ -3,12 +3,14 @@ package handler
 import "bee-library/features/members/entity"
 
 type MemberResponse struct {
-	ID      uint   `json:"id"`
-	Name    string `json:"name"`
-	Email   string `json:"email"`
-	Phone   string `json:"phone"`
-	Address string `json:"address"`
-	Photo   string `json:"photo,omitempty"`
+	ID      	uint   `json:"id"`
+	Name    	string `json:"name"`
+	Email   	string `json:"email"`
+	Phone   	string `json:"phone"`
+	Address 	string `json:"address"`
+	Photo   	string `json:"photo,omitempty"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 func ToMemberResponse(member entity.Member) MemberResponse {
@@ -19,6 +21,8 @@ func ToMemberResponse(member entity.Member) MemberResponse {
 		Phone:   member.Phone,
 		Address: member.Address,
 		Photo:   member.Photo,
+		CreatedAt: member.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt: member.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
 }
 

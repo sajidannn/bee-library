@@ -6,6 +6,7 @@ import (
 	"bee-library/helper"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -68,6 +69,8 @@ func (h *MemberHandler) CreateMember(c *gin.Context) {
 		Phone:   	req.Phone,
 		Address: 	req.Address,
 		Photo:   	req.Photo,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	err := h.service.CreateMember(&member)
@@ -98,31 +101,22 @@ func (h *MemberHandler) UpdateMember(c *gin.Context) {
 		return
 	}
 
-	// Simpan hanya field yang dikirim dalam map[string]interface{}
-	updatedFields := make(map[string]interface{})
+	updatedMember := entity.Member{}
 	if req.Name != nil {
-		updatedFields["name"] = *req.Name
+		updatedMember.Name = *req.Name
 	}
 	if req.Phone != nil {
-		updatedFields["phone"] = *req.Phone
+		updatedMember.Phone = *req.Phone
 	}
 	if req.Address != nil {
-		updatedFields["address"] = *req.Address
+		updatedMember.Address = *req.Address
 	}
 	if req.Photo != nil {
-		updatedFields["photo"] = *req.Photo
+		updatedMember.Photo = *req.Photo
 	}
+	updatedMember.UpdatedAt = time.Now()
 
-	// Jika tidak ada field yang diperbarui, return error
-	if len(updatedFields) == 0 {
-		c.JSON(http.StatusBadRequest, helper.ResponseError{
-			Status:  "error",
-			Message: "No fields to update",
-		})
-		return
-	}
-
-	err := h.service.UpdateMember(uint(id), updatedFields)
+	err := h.service.UpdateMember(uint(id), &updatedMember)
 	if err != nil {
 		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
 			Status:  "error",

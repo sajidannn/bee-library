@@ -6,6 +6,7 @@ import (
 	bookRepo "bee-library/features/books/repository"
 	"bee-library/features/members"
 	memberRepo "bee-library/features/members/repository"
+	stockRepo "bee-library/features/stocks/repository"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,7 @@ func main() {
 	err := db.DB.AutoMigrate(
 		&bookRepo.Book{},
 		&memberRepo.Member{},
+		&stockRepo.Stock{},
 	)
 	if err != nil {
 		fmt.Println("Migration failed:", err)
