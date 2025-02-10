@@ -10,16 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type BookRepository interface {
-	GetAll() ([]entity.Book, error)
-	GetByID(id uint) (*entity.Book, int, int, error)
-	Create(book *entity.Book) error
-	Update(id uint, updatedBook *entity.Book) error
-	Delete(id uint) error
-	IsIsbnExist(isbn string) (bool, error)
-	IsBookExist(id uint) (bool, error)
-}
-
 type bookRepository struct {
 	db *gorm.DB
 }
@@ -30,7 +20,7 @@ type bookWithStock struct {
 	AvailableStock int `json:"available_stock"`
 }
 
-func NewBookRepository(db *gorm.DB) BookRepository {
+func NewBookRepository(db *gorm.DB) entity.BookRepository {
 	return &bookRepository{db: db}
 }
 

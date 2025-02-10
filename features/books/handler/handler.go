@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bee-library/features/books/entity"
-	"bee-library/features/books/service"
 	"bee-library/helper"
 	"net/http"
 	"strconv"
@@ -12,10 +11,10 @@ import (
 )
 
 type BookHandler struct {
-	service service.BookService
+	service entity.BookService
 }
 
-func NewBookHandler(service service.BookService) *BookHandler {
+func NewBookHandler(service entity.BookService) *BookHandler {
 	return &BookHandler{service: service}
 }
 

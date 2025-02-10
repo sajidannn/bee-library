@@ -2,25 +2,14 @@ package service
 
 import (
 	"bee-library/features/members/entity"
-	"bee-library/features/members/repository"
 	"bee-library/helper"
 )
 
-type MemberService interface {
-	GetAllMembers() ([]entity.Member, error)
-	GetMemberByID(id uint) (*entity.Member, error)
-	CreateMember(member *entity.Member) error
-	// login
-	UpdateMember(id uint, updatedMember *entity.Member) error
-	// update password
-	DeleteMember(id uint) error
-}
-
 type memberService struct {
-	repo repository.MemberRepository
+	repo entity.MemberRepository
 }
 
-func NewMemberService(repo repository.MemberRepository) MemberService {
+func NewMemberService(repo entity.MemberRepository) entity.MemberService {
 	return &memberService{repo: repo}
 }
 

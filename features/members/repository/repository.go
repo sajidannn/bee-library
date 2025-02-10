@@ -8,28 +8,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type MemberRepository interface {
-	GetAll() ([]entity.Member, error)
-	GetByID(id uint) (*entity.Member, error)
-	Create(member *entity.Member) error
-	// login
-	Update(id uint, updatedMember *entity.Member) error
-	// update password
-	Delete(id uint) error
-	IsEmailExist(email string) (bool, error)
-}
-
 type memberRepository struct {
 	db *gorm.DB
 }
 
-func NewMemberRepository(db *gorm.DB) MemberRepository {
+func NewMemberRepository(db *gorm.DB) entity.MemberRepository {
 	return &memberRepository{db: db}
 }
 
 func (r *memberRepository) GetAll() ([]entity.Member, error) {
 	var members []entity.Member
-	err := r.db.Find(&members).Error
+	err := r.db.Select("id, name, email, phone, address").
+		Find(&members).Error
 	return members, err
 }
 

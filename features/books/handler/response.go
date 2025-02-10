@@ -24,12 +24,12 @@ type BookDetailResponse struct {
 	Author     string        `json:"author"`
 	Publisher  string        `json:"publisher"`
 	Category   string        `json:"category"`
-	Isbn       string        `json:"isbn,omitempty"`
-	Year       string        `json:"year,omitempty"`
-	CoverImage string        `json:"cover_image,omitempty"`
-	CreatedAt  string        `json:"created_at,omitempty"`
-	UpdatedAt  string        `json:"updated_at,omitempty"`
-	Stock      StockResponse `json:"stock,omitempty"`
+	Isbn       string        `json:"isbn"`
+	Year       string        `json:"year"`
+	CoverImage string        `json:"cover_image"`
+	CreatedAt  string        `json:"created_at"`
+	UpdatedAt  string        `json:"updated_at"`
+	Stock      StockResponse `json:"stock"`
 }
 
 func ToBookResponse(book entity.Book) BookResponse {
@@ -43,14 +43,6 @@ func ToBookResponse(book entity.Book) BookResponse {
 }
 
 func ToBookDetailResponse(book entity.Book, totalStock, availableStock int) BookDetailResponse {
-	var createdAtStr, updatedAtStr string
-	if !book.CreatedAt.IsZero() {
-		createdAtStr = book.CreatedAt.Format("2006-01-02 15:04:05")
-	}
-	if !book.UpdatedAt.IsZero() {
-		updatedAtStr = book.UpdatedAt.Format("2006-01-02 15:04:05")
-	}
-
 	return BookDetailResponse{
 		ID:         book.ID,
 		Title:      book.Title,
@@ -60,8 +52,8 @@ func ToBookDetailResponse(book entity.Book, totalStock, availableStock int) Book
 		Isbn:       book.Isbn,
 		Year:       book.Year,
 		CoverImage: book.CoverImage,
-		CreatedAt:  createdAtStr,
-		UpdatedAt:  updatedAtStr,
+		CreatedAt:  book.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:  book.UpdatedAt.Format("2006-01-02 15:04:05"),
 		Stock: StockResponse{
 			TotalStock:     totalStock,
 			AvailableStock: availableStock,

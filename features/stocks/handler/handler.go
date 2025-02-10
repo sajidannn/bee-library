@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bee-library/features/stocks/entity"
-	"bee-library/features/stocks/service"
 	"bee-library/helper"
 	"net/http"
 	"strconv"
@@ -12,10 +11,10 @@ import (
 )
 
 type StockHandler struct {
-	service service.StockService
+	service entity.StockService
 }
 
-func NewStockHandler(service service.StockService) *StockHandler {
+func NewStockHandler(service entity.StockService) *StockHandler {
 	return &StockHandler{service: service}
 }
 

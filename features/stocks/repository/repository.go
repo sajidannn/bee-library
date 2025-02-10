@@ -8,17 +8,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type StockRepository interface {
-	GetAll() ([]entity.Stock, error)
-	GetByID(bookID uint) (*entity.Stock, error)
-	Update(bookID uint, updatedStock entity.Stock) error
-}
-
 type stockRepository struct {
 	db *gorm.DB
 }
 
-func NewStockRepository(db *gorm.DB) StockRepository {
+func NewStockRepository(db *gorm.DB) entity.StockRepository {
 	return &stockRepository{db: db}
 }
 

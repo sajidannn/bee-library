@@ -7,6 +7,8 @@ type StockResponse struct {
 	BookID         uint   `json:"book_id"`
 	TotalStock     int    `json:"total_stock"`
 	AvailableStock int    `json:"available_stock"`
+	CreatedAt      string `json:"created_at"`
+	UpdatedAt      string `json:"updated_at"`
 }
 
 func ToStockResponse(stock entity.Stock) StockResponse {
@@ -15,6 +17,8 @@ func ToStockResponse(stock entity.Stock) StockResponse {
 		BookID:         stock.BookID,
 		TotalStock:     stock.TotalStock,
 		AvailableStock: stock.AvailableStock,
+		CreatedAt:      stock.CreatedAt.Format("2006-01-02 15:04:05"),
+		UpdatedAt:      stock.UpdatedAt.Format("2006-01-02 15:04:05"),
 	}
 }
 

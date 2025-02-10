@@ -2,23 +2,14 @@ package service
 
 import (
 	"bee-library/features/books/entity"
-	"bee-library/features/books/repository"
 	"bee-library/helper"
 )
 
-type BookService interface {
-	GetAllBooks() ([]entity.Book, error)
-	GetBookByID(id uint) (*entity.Book, int, int, error)
-	CreateBook(book *entity.Book) error
-	UpdateBook(id uint, updatedBook *entity.Book) error
-	DeleteBook(id uint) error
-}
-
 type bookService struct {
-	repo repository.BookRepository
+	repo entity.BookRepository
 }
 
-func NewBookService(repo repository.BookRepository) BookService {
+func NewBookService(repo entity.BookRepository) entity.BookService {
 	return &bookService{repo: repo}
 }
 

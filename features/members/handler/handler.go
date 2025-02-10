@@ -2,7 +2,6 @@ package handler
 
 import (
 	"bee-library/features/members/entity"
-	"bee-library/features/members/service"
 	"bee-library/helper"
 	"net/http"
 	"strconv"
@@ -12,10 +11,10 @@ import (
 )
 
 type MemberHandler struct {
-	service service.MemberService
+	service entity.MemberService
 }
 
-func NewMemberHandler(service service.MemberService) *MemberHandler {
+func NewMemberHandler(service entity.MemberService) *MemberHandler {
 	return &MemberHandler{service: service}
 }
 
@@ -48,7 +47,7 @@ func (h *MemberHandler) GetMemberByID(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.Response{
 		Status:  "success",
 		Message: "Member retrieved successfully",
-		Data:    ToMemberResponse(*member),
+		Data:    ToMemberDetailResponse(*member),
 	})
 }
 

@@ -2,22 +2,15 @@ package service
 
 import (
 	"bee-library/features/stocks/entity"
-	"bee-library/features/stocks/repository"
 	"bee-library/helper"
 	"errors"
 )
 
-type StockService interface {
-	GetAllStock() ([]entity.Stock, error)
-	GetStockByBookID(bookID uint) (*entity.Stock, error)
-	UpdateStock(bookID uint, updatedStock *entity.Stock) error
-}
-
 type stockService struct {
-	repo repository.StockRepository
+	repo entity.StockRepository
 }
 
-func NewStockService(repo repository.StockRepository) StockService {
+func NewStockService(repo entity.StockRepository) entity.StockService {
 	return &stockService{repo: repo}
 }
 
