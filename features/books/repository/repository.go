@@ -3,6 +3,7 @@ package repository
 import (
 	"bee-library/features/books/entity"
 	entityStock "bee-library/features/stocks/entity"
+	"bee-library/helper"
 	"errors"
 	"time"
 
@@ -11,15 +12,22 @@ import (
 
 type BookRepository interface {
 	GetAll() ([]entity.Book, error)
-	GetByID(id uint) (*entity.Book, error)
+	GetByID(id uint) (*entity.Book, int, int, error)
 	Create(book *entity.Book) error
 	Update(id uint, updatedBook *entity.Book) error
 	Delete(id uint) error
 	IsIsbnExist(isbn string) (bool, error)
+	IsBookExist(id uint) (bool, error)
 }
 
 type bookRepository struct {
 	db *gorm.DB
+}
+
+type bookWithStock struct {
+	entity.Book     
+	TotalStock     int `json:"total_stock"`
+	AvailableStock int `json:"available_stock"`
 }
 
 func NewBookRepository(db *gorm.DB) BookRepository {
@@ -33,16 +41,28 @@ func (r *bookRepository) GetAll() ([]entity.Book, error) {
 	return books, err
 }
 
-func (r *bookRepository) GetByID(id uint) (*entity.Book, error) {
-	var book entity.Book
-	err := r.db.First(&book, id).Error
+func (r *bookRepository) GetByID(id uint) (*entity.Book, int, int, error) {
+	var bookData bookWithStock
+
+	err := r.db.Raw(`
+		SELECT b.id, b.title, b.author, b.publisher, b.category, b.isbn, b.year, b.cover_image, 
+		       b.created_at, b.updated_at, 
+		       COALESCE(s.total_stock, 0) AS total_stock, 
+		       COALESCE(s.available_stock, 0) AS available_stock
+		FROM books b
+		LEFT JOIN stocks s ON b.id = s.book_id
+		WHERE b.id = ?
+	`, id).Scan(&bookData).Error
+
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("book not found")
-		}
-		return nil, err
+		return nil, 0, 0, err
 	}
-	return &book, nil
+
+	if bookData.Book.ID == 0 {
+		return nil, 0, 0, helper.ErrNotFound
+	}
+
+	return &bookData.Book, bookData.TotalStock, bookData.AvailableStock, nil
 }
 
 func (r *bookRepository) Create(book *entity.Book) error {
@@ -80,6 +100,18 @@ func (r *bookRepository) Delete(id uint) error {
 func (r *bookRepository) IsIsbnExist(isbn string) (bool, error) {
 	var book entity.Book
 	err := r.db.Where("isbn = ?", isbn).First(&book).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}
+
+func (r *bookRepository) IsBookExist(id uint) (bool, error) {
+	var book entity.Book
+	err := r.db.Where("id = ?", id).First(&book).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil

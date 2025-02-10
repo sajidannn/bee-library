@@ -37,7 +37,7 @@ func (h *BookHandler) GetAllBooks(c *gin.Context) {
 
 func (h *BookHandler) GetBookByID(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	book, err := h.service.GetBookByID(uint(id))
+	book,totalStock, availableStock, err := h.service.GetBookByID(uint(id))
 	if err != nil {
 		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
 			Status:  "error",
@@ -48,7 +48,7 @@ func (h *BookHandler) GetBookByID(c *gin.Context) {
 	c.JSON(http.StatusOK, helper.Response{
 		Status:  "success",
 		Message: "Book retrieved successfully",
-		Data:    ToBookResponse(*book),
+		Data:    ToBookDetailResponse(*book, totalStock, availableStock),
 	})
 }
 
