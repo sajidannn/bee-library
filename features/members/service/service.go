@@ -34,7 +34,6 @@ func (s *memberService) CreateMember(newMember *entity.Member) error {
 		return helper.ErrEmailExists
 	}
 
-	newMember.Password, _ = helper.HashPassword(newMember.Password)
 	if err := s.repo.Create(newMember); err != nil {
 		return helper.ErrInternalServer
 	}

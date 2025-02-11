@@ -3,6 +3,8 @@ package handler
 import (
 	"bee-library/features/members/entity"
 	"bee-library/helper"
+	"bee-library/utils"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 	"time"
@@ -57,7 +59,7 @@ func (h *MemberHandler) GetMemberByID(c *gin.Context) {
 
 func (h *MemberHandler) CreateMember(c *gin.Context) {
 	var req MemberCreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, helper.ResponseError{
 			Status:  "error",
 			Message: err.Error(),
@@ -65,13 +67,28 @@ func (h *MemberHandler) CreateMember(c *gin.Context) {
 		return
 	}
 
+	var photoURL string
+	file, fileExists := c.Get("photo_file")
+	fileName, nameExists := c.Get("photo_fileName")
+
+	if fileExists && nameExists {
+		uploadedURL, err := utils.UploadToCloudinary(file.(multipart.File), fileName.(string), "members-photo")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, helper.ResponseError{
+				Status:  "error",
+				Message: "Failed to upload photo",
+			})
+			return
+		}
+		photoURL = uploadedURL
+	}
+
 	member := entity.Member{
-		Name:    	req.Name,
-		Email:   	req.Email,
-		Password: req.Password,
-		Phone:   	req.Phone,
-		Address: 	req.Address,
-		Photo:   	req.Photo,
+		Name:      req.Name,
+		Email:     req.Email,
+		Phone:     req.Phone,
+		Address:   req.Address,
+		Photo:     photoURL,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -84,6 +101,7 @@ func (h *MemberHandler) CreateMember(c *gin.Context) {
 		})
 		return
 	}
+
 	c.JSON(http.StatusCreated, helper.Response{
 		Status:  "success",
 		Message: "Member created successfully",
@@ -96,7 +114,7 @@ func (h *MemberHandler) CreateMember(c *gin.Context) {
 func (h *MemberHandler) UpdateMember(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	var req MemberUpdateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, helper.ResponseError{
 			Status:  "error",
 			Message: err.Error(),
@@ -104,7 +122,18 @@ func (h *MemberHandler) UpdateMember(c *gin.Context) {
 		return
 	}
 
-	updatedMember := entity.Member{}
+	existingMember, err := h.service.GetMemberByID(uint(id))
+	if err != nil {
+		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
+			Status:  "error",
+			Message: "Member not found",
+		})
+		return
+	}
+
+	updatedMember := entity.Member{
+		UpdatedAt: time.Now(),
+	}
 	if req.Name != nil {
 		updatedMember.Name = *req.Name
 	}
@@ -114,12 +143,33 @@ func (h *MemberHandler) UpdateMember(c *gin.Context) {
 	if req.Address != nil {
 		updatedMember.Address = *req.Address
 	}
-	if req.Photo != nil {
-		updatedMember.Photo = *req.Photo
-	}
-	updatedMember.UpdatedAt = time.Now()
 
-	err := h.service.UpdateMember(uint(id), &updatedMember)
+	file, fileExists := c.Get("photo_file")
+	fileName, nameExists := c.Get("photo_fileName")
+
+	if fileExists && nameExists {
+		if existingMember.Photo != "" {
+			err := utils.DeleteFromCloudinary(existingMember.Photo)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, helper.ResponseError{
+					Status:  "error",
+					Message: "Failed to delete old photo",
+				})
+				return
+			}
+		}
+		uploadedURL, err := utils.UploadToCloudinary(file.(multipart.File), fileName.(string), "members-photo")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, helper.ResponseError{
+				Status:  "error",
+				Message: "Failed to upload photo",
+			})
+			return
+		}
+		updatedMember.Photo = uploadedURL
+	}
+	
+	err = h.service.UpdateMember(uint(id), &updatedMember)
 	if err != nil {
 		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
 			Status:  "error",
@@ -132,7 +182,6 @@ func (h *MemberHandler) UpdateMember(c *gin.Context) {
 		Message: "Member updated successfully",
 	})
 }
-
 
 // update password
 

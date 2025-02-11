@@ -1,20 +1,20 @@
 package handler
 
 type BookCreateRequest struct {
-	Title      string `json:"title" binding:"required"`
-	Author     string `json:"author" binding:"required"`
-	Publisher  string `json:"publisher"`
-	Category   string `json:"category"`
-	Isbn       string `json:"isbn"`
-	Year       string `json:"year"`
-	CoverImage string `json:"cover_image"`
+	Title     string `form:"title" binding:"required"`
+	Author    string `form:"author" binding:"required"`
+	Publisher string `form:"publisher"`
+	Category  string `form:"category"`
+	Isbn      string `form:"isbn"`
+	Year      string `form:"year"`
+	// CoverImage string `json:"cover_image"`
 }
 
 type BookUpdateRequest struct {
-	Title      *string `json:"title"`
-	Author     *string `json:"author"`
-	Publisher  *string `json:"publisher"`
-	Category   *string `json:"category"`
-	Year       *string `json:"year"`
-	CoverImage *string `json:"cover_image"`
+	Title     *string `form:"title"`
+	Author    *string `form:"author"`
+	Publisher *string `form:"publisher"`
+	Category  *string `form:"category"`
+	Year      *string `form:"year"`
+	// CoverImage *string `json:"cover_image"`
 }

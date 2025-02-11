@@ -3,6 +3,8 @@ package handler
 import (
 	"bee-library/features/books/entity"
 	"bee-library/helper"
+	"bee-library/utils"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 	"time"
@@ -57,12 +59,28 @@ func (h *BookHandler) GetBookByID(c *gin.Context) {
 
 func (h *BookHandler) CreateBook(c *gin.Context) {
 	var req BookCreateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, helper.ResponseError{
 			Status:  "error",
 			Message: err.Error(),
 		})
 		return
+	}
+
+	var coverURL string
+	file, fileExists := c.Get("cover_image_file")
+	fileName, nameExists := c.Get("cover_image_fileName")
+
+	if fileExists && nameExists {
+		uploadedURL, err := utils.UploadToCloudinary(file.(multipart.File), fileName.(string), "book-covers")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, helper.ResponseError{
+				Status:  "error",
+				Message: "Failed to upload photo",
+			})
+			return
+		}
+		coverURL = uploadedURL
 	}
 
 	newBook := entity.Book{
@@ -72,7 +90,7 @@ func (h *BookHandler) CreateBook(c *gin.Context) {
 		Category:   req.Category,
 		Isbn:       req.Isbn,
 		Year:       req.Year,
-		CoverImage: req.CoverImage,
+		CoverImage: coverURL,
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
@@ -95,7 +113,7 @@ func (h *BookHandler) CreateBook(c *gin.Context) {
 func (h *BookHandler) UpdateBook(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	var req BookUpdateRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		c.JSON(http.StatusBadRequest, helper.ResponseError{
 			Status:  "error",
 			Message: err.Error(),
@@ -103,7 +121,18 @@ func (h *BookHandler) UpdateBook(c *gin.Context) {
 		return
 	}
 
-	updatedBook := entity.Book{}
+	existingBook, _, _, err := h.service.GetBookByID(uint(id))
+	if err != nil {
+		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
+			Status:  "error",
+			Message: err.Error(),
+		})
+		return
+	}
+
+	updatedBook := entity.Book{
+		UpdatedAt: time.Now(),
+	}
 	if req.Title != nil {
 		updatedBook.Title = *req.Title
 	}
@@ -119,12 +148,33 @@ func (h *BookHandler) UpdateBook(c *gin.Context) {
 	if req.Year != nil {
 		updatedBook.Year = *req.Year
 	}
-	if req.CoverImage != nil {
-		updatedBook.CoverImage = *req.CoverImage
-	}
-	updatedBook.UpdatedAt = time.Now()
 
-	err := h.service.UpdateBook(uint(id), &updatedBook)
+	file, fileExists := c.Get("cover_image_file")
+	fileName, nameExists := c.Get("cover_image_fileName")
+
+	if fileExists && nameExists {
+		if existingBook.CoverImage != "" {
+			err := utils.DeleteFromCloudinary(existingBook.CoverImage)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, helper.ResponseError{
+					Status:  "error",
+					Message: "Failed to delete old photo",
+				})
+				return
+			}
+		}
+		uploadedURL, err := utils.UploadToCloudinary(file.(multipart.File), fileName.(string), "book-covers")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, helper.ResponseError{
+				Status:  "error",
+				Message: "Failed to upload photo",
+			})
+			return
+		}
+		updatedBook.CoverImage = uploadedURL
+	}
+
+	err = h.service.UpdateBook(uint(id), &updatedBook)
 	if err != nil {
 		c.JSON(helper.MapErrorCode(err), helper.ResponseError{
 			Status:  "error",

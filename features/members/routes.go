@@ -5,6 +5,7 @@ import (
 	"bee-library/features/members/handler"
 	"bee-library/features/members/repository"
 	"bee-library/features/members/service"
+	middleware "bee-library/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,8 +19,8 @@ func RegisterMemberRoutes(r *gin.Engine) {
 	{
 		memberRoutes.GET("/", memberHandler.GetAllMembers)
 		memberRoutes.GET("/:id", memberHandler.GetMemberByID)
-		memberRoutes.POST("/", memberHandler.CreateMember)
-		memberRoutes.PUT("/:id", memberHandler.UpdateMember)
+		memberRoutes.POST("", middleware.FileUploadMiddleware("photo"), memberHandler.CreateMember)
+		memberRoutes.PUT("/:id", middleware.FileUploadMiddleware("photo"), memberHandler.UpdateMember)
 		memberRoutes.DELETE("/:id", memberHandler.DeleteMember)
 	}
 }

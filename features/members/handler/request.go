@@ -1,18 +1,14 @@
 package handler
 
 type MemberCreateRequest struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-	Phone    string `json:"phone" binding:"required"`
-	Address  string `json:"address" binding:"required"`
-	Photo    string `json:"photo"`
+	Name    string `form:"name" binding:"required"`
+	Email   string `form:"email" binding:"required,email"`
+	Phone   string `form:"phone" binding:"required"`
+	Address string `form:"address" binding:"required"`
 }
 
 type MemberUpdateRequest struct {
-	Name *string `json:"name"`
-	// Password *string `json:"password"`
-	Phone   *string `json:"phone"`
-	Address *string `json:"address"`
-	Photo   *string `json:"photo"`
+	Name    *string `form:"name"`
+	Phone   *string `form:"phone"`
+	Address *string `form:"address"`
 }
