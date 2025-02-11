@@ -13,4 +13,6 @@ type Stock struct {
 	TotalStock     int    			`gorm:"not null;check:total_stock >= 0"`
 	AvailableStock int    			`gorm:"not null;check:available_stock >= 0"`
 	Book           entity.Book  `gorm:"constraint:OnDelete:CASCADE;"`
+	CreatedAt	 	string `gorm:"type:timestamp"`
+	UpdatedAt	 	string `gorm:"type:timestamp"`
 }

@@ -10,4 +10,6 @@ type Member struct {
 	Phone   	string `gorm:"type:varchar(20);not null"`
 	Address 	string `gorm:"type:text;not null"`
 	Photo   	string `gorm:"type:text"`
+	CreatedAt	 	string `gorm:"type:timestamp"`
+	UpdatedAt	 	string `gorm:"type:timestamp"`
 }

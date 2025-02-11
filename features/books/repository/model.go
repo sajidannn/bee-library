@@ -11,4 +11,6 @@ type Book struct {
 	Isbn				string `gorm:"type:varchar(255);UNIQUE;"`
 	Year        string `gorm:"type:varchar(255);"`
 	CoverImage  string `gorm:"type:text"`
+	CreatedAt	 	string `gorm:"type:timestamp"`
+	UpdatedAt	 	string `gorm:"type:timestamp"`
 }

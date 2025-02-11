@@ -27,6 +27,10 @@ func (h *BookHandler) GetAllBooks(c *gin.Context) {
 		})
 		return
 	}
+	if len(books) == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "There's no data"})
+		return
+	}
 	c.JSON(http.StatusOK, helper.Response{
 		Status:  "success",
 		Message: "Books retrieved successfully",

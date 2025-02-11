@@ -16,6 +16,7 @@ type BorrowTransaction struct {
 	BorrowDate 	time.Time `gorm:"not null"`
 	DueDate   	time.Time `gorm:"not null"`
 	Status    	string    `gorm:"type:varchar(20);check:status IN ('borrowed', 'returned')"`
+	CreatedAt	 	string 		`gorm:"type:timestamp"`
 	Member     	memberEntity.Member  `gorm:"constraint:OnDelete:CASCADE;"`
 	Book				bookEntity.Book  `gorm:"constraint:OnDelete:CASCADE;"`
 }

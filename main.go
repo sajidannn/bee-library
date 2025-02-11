@@ -10,6 +10,9 @@ import (
 	borrowTransactionRepo "bee-library/features/borrow_transactions/repository"
 	"bee-library/features/members"
 	memberRepo "bee-library/features/members/repository"
+	returnReportRepo "bee-library/features/return_reports/repository"
+	returnTransaction "bee-library/features/return_transactions"
+	returnTransactiontRepo "bee-library/features/return_transactions/repository"
 	"bee-library/features/stocks"
 	stockRepo "bee-library/features/stocks/repository"
 	"fmt"
@@ -26,6 +29,8 @@ func main() {
 		&stockRepo.Stock{},
 		&borrowTransactionRepo.BorrowTransaction{},
 		&borrowReportRepo.BorrowReport{},
+		&returnTransactiontRepo.ReturnTransaction{},
+		&returnReportRepo.ReturnReport{},
 	)
 	if err != nil {
 		fmt.Println("Migration failed:", err)
@@ -39,6 +44,7 @@ func main() {
 	stocks.RegisterStockRoutes(r)
 	borrowTransaction.RegisterBorrowTransactionRoutes(r)
 	borrowReport.RegisterBorrowReportRoutes(r)
+	returnTransaction.RegisterReturnTransactionRoutes(r)
 
 	r.Run(":8000")
 }

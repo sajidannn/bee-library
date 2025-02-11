@@ -35,7 +35,7 @@ func (r *borrowTransactionRepo) GetByID(id uint) (*borrowTransactionEntity.Borro
 		}
 		return nil, err
 	}
-	return &transaction, err
+	return &transaction, nil
 }
 
 func (r *borrowTransactionRepo) Create(transaction *borrowTransactionEntity.BorrowTransaction) error {

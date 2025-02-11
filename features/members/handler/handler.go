@@ -27,6 +27,10 @@ func (h *MemberHandler) GetAllMembers(c *gin.Context) {
 		})
 		return
 	}
+	if len(members) == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "There's no data"})
+		return
+	}
 	c.JSON(http.StatusOK, helper.Response{
 		Status:  "success",
 		Message: "Members retrieved successfully",
