@@ -17,6 +17,7 @@ import (
 	"bee-library/features/stocks"
 	stockRepo "bee-library/features/stocks/repository"
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -40,6 +41,9 @@ func main() {
 	}
 
 	r := gin.Default()
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "Hello from bee library!"})
+	})
 	members.RegisterMemberRoutes(r)
 	books.RegisterBookRoutes(r)
 	stocks.RegisterStockRoutes(r)
@@ -48,5 +52,5 @@ func main() {
 	returnTransaction.RegisterReturnTransactionRoutes(r)
 	returnReport.RegisterReturnReportRoutes(r)
 
-	r.Run(":8000")
+	r.Run(":8080")
 }
