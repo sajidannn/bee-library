@@ -10,6 +10,7 @@ import (
 	borrowTransactionRepo "bee-library/features/borrow_transactions/repository"
 	"bee-library/features/members"
 	memberRepo "bee-library/features/members/repository"
+	returnReport "bee-library/features/return_reports"
 	returnReportRepo "bee-library/features/return_reports/repository"
 	returnTransaction "bee-library/features/return_transactions"
 	returnTransactiontRepo "bee-library/features/return_transactions/repository"
@@ -45,6 +46,7 @@ func main() {
 	borrowTransaction.RegisterBorrowTransactionRoutes(r)
 	borrowReport.RegisterBorrowReportRoutes(r)
 	returnTransaction.RegisterReturnTransactionRoutes(r)
+	returnReport.RegisterReturnReportRoutes(r)
 
 	r.Run(":8000")
 }
