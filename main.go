@@ -4,6 +4,7 @@ import (
 	"bee-library/db"
 	"bee-library/features/books"
 	bookRepo "bee-library/features/books/repository"
+	borrowReport "bee-library/features/borrow_reports"
 	borrowReportRepo "bee-library/features/borrow_reports/repository"
 	borrowTransaction "bee-library/features/borrow_transactions"
 	borrowTransactionRepo "bee-library/features/borrow_transactions/repository"
@@ -37,6 +38,7 @@ func main() {
 	books.RegisterBookRoutes(r)
 	stocks.RegisterStockRoutes(r)
 	borrowTransaction.RegisterBorrowTransactionRoutes(r)
+	borrowReport.RegisterBorrowReportRoutes(r)
 
 	r.Run(":8000")
 }
